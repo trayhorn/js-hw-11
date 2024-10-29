@@ -1,5 +1,8 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
+
 
 const form = document.querySelector('.form');
 const gallery = document.querySelector('.gallery');
@@ -26,6 +29,11 @@ function onFormSubmit(e) {
           });
         } else {
           gallery.innerHTML = createMarkUp(res.hits);
+          new SimpleLightbox('.item-link', {
+            captions: true,
+            captionsData: 'alt',
+            captionDelay: 250,
+          });
         }
       })
       .catch(error => console.log(error));
@@ -51,15 +59,17 @@ function getImagesOnSearch(query) {
 }
 
 function createMarkUp(arr) {
-  return arr.map((el) =>
-         `<li class="gallery-item">
-            <div class="image-container">
+  return arr
+    .map(
+      el =>
+        `<li class="gallery-item">
+            <a class="item-link" href="${el.largeImageURL}">
               <img
                 class="item-image"
-                src="${el.webformatURL}" 
+                src="${el.webformatURL}"
                 alt="${el.tags}"
               >
-            </div>
+            </a>
             <div class="item-stats_container">
               <p class="item-stats"><span>Likes</span>${el.likes}</p>
               <p class="item-stats"><span>Views</span>${el.views}</p>
@@ -67,5 +77,6 @@ function createMarkUp(arr) {
               <p class="item-stats"><span>Downloads</span>${el.downloads}</p>
             </div>
           </li>`
-    ).join('');
+    )
+    .join('');
 }
