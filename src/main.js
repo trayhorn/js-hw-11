@@ -7,6 +7,12 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 const form = document.querySelector('.form');
 const gallery = document.querySelector('.gallery');
 
+const lightbox = new SimpleLightbox('.item-link', {
+  captions: true,
+  captionsData: 'alt',
+  captionDelay: 250,
+});
+
 form.addEventListener('submit', onFormSubmit);
 
 function onFormSubmit(e) {
@@ -29,11 +35,7 @@ function onFormSubmit(e) {
           });
         } else {
           gallery.innerHTML = createMarkUp(res.hits);
-          new SimpleLightbox('.item-link', {
-            captions: true,
-            captionsData: 'alt',
-            captionDelay: 250,
-          });
+          lightbox.refresh();
         }
       })
       .catch(error => console.log(error));
