@@ -6,6 +6,7 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 
 const form = document.querySelector('.form');
 const gallery = document.querySelector('.gallery');
+const loading = document.querySelector('.loading');
 
 const lightbox = new SimpleLightbox('.item-link', {
   captions: true,
@@ -34,11 +35,15 @@ function onFormSubmit(e) {
               'Sorry, there are no images matching your search query. Please try again!',
           });
         } else {
+          loading.classList.add('is-hidden');
           gallery.innerHTML = createMarkUp(res.hits);
           lightbox.refresh();
         }
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        loading.classList.add('is-hidden');
+        console.log(error)
+      });
   }
 }
 
@@ -51,11 +56,13 @@ function getImagesOnSearch(query) {
     safesearch: true,
   });
 
+  loading.classList.remove('is-hidden');
+  gallery.innerHTML = '';
+
   return fetch(`https://pixabay.com/api/?${params}`).then(res => {
     if (!res.ok) {
       throw new Error(res.status);
     }
-
     return res.json();
   });
 }

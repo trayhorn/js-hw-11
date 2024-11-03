@@ -84,3 +84,12 @@ body {
   line-height: 16px;
   font-weight: 600;
 }
+
+.loading {
+  display: flex;
+  justify-content: center;
+}
+
+.is-hidden {
+  display: none;
+}
