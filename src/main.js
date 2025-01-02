@@ -7,6 +7,10 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 const form = document.querySelector('.form');
 const gallery = document.querySelector('.gallery');
 const loading = document.querySelector('.loading');
+const target = document.querySelector('.js-guard');
+
+let page = 1;
+let queryInput = '';
 
 const lightbox = new SimpleLightbox('.item-link', {
   captions: true,
@@ -14,20 +18,44 @@ const lightbox = new SimpleLightbox('.item-link', {
   captionDelay: 250,
 });
 
+const options = {
+  root: null,
+  rootMargin: '200px',
+  threshold: 1.0,
+};
+
+const callback = entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      page++;
+      getImagesOnSearch(queryInput)
+        .then(res => {
+          gallery.insertAdjacentHTML('beforeend', createMarkUp(res.hits));
+          lightbox.refresh();
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+  });
+};
+
+const observer = new IntersectionObserver(callback, options);
+
 form.addEventListener('submit', onFormSubmit);
 
 function onFormSubmit(e) {
   e.preventDefault();
 
-  const queryInput = e.currentTarget.elements.query;
+  queryInput = e.currentTarget.elements.query.value;
 
-  if (queryInput.value === '') {
+  if (queryInput === '') {
     iziToast.error({
       message:
         'Please enter a value!',
     });
   } else {
-    getImagesOnSearch(queryInput.value)
+    getImagesOnSearch(queryInput)
       .then(res => {
         if (res.hits.length === 0) {
           iziToast.error({
@@ -36,7 +64,8 @@ function onFormSubmit(e) {
           });
         } else {
           loading.classList.add('is-hidden');
-          gallery.innerHTML = createMarkUp(res.hits);
+          gallery.insertAdjacentHTML('beforeend', createMarkUp(res.hits));
+          observer.observe(target);
           lightbox.refresh();
         }
       })
@@ -54,10 +83,11 @@ function getImagesOnSearch(query) {
     image_type: 'photo',
     orientation: 'horizontal',
     safesearch: true,
+    page
   });
 
   loading.classList.remove('is-hidden');
-  gallery.innerHTML = '';
+  // gallery.innerHTML = '';
 
   return fetch(`https://pixabay.com/api/?${params}`).then(res => {
     if (!res.ok) {
