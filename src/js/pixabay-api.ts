@@ -1,13 +1,3 @@
-type SearchParams = {
-  key: string;
-  q: string;
-  image_type: string;
-  orientation: string;
-  safesearch: boolean;
-  page: number;
-}
-
-
 export default function getImagesOnSearch(query: string, page: number) {
   const params = new URLSearchParams ({
     key: '29734383-6ec437d7a0c5df52cef54a0f9',

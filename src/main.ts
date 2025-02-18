@@ -1,18 +1,20 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
+// @ts-ignore
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import createMarkUp from './js/render-functions';
 import getImagesOnSearch from './js/pixabay-api';
 
 
-const form = document.querySelector('.form');
-const gallery = document.querySelector('.gallery');
-const loading = document.querySelector('.loading');
-const target = document.querySelector('.js-guard');
+const form = document.querySelector('.form') as HTMLElement;
+const gallery = document.querySelector('.gallery') as HTMLElement;
+const loading = document.querySelector('.loading') as HTMLElement;
+const target = document.querySelector('.js-guard') as HTMLElement;
 
-let currentPage = 1;
-let queryInput = '';
+
+let currentPage: number = 1;
+let queryInput: string = '';
 
 const lightbox = new SimpleLightbox('.item-link', {
   captions: true,
@@ -28,7 +30,8 @@ const options = {
   threshold: 1.0,
 };
 
-const onLoad = entries => {
+const onLoad = (entries: IntersectionObserverEntry[]) => {
+  console.log(entries);
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       currentPage++;
@@ -54,18 +57,21 @@ const observer = new IntersectionObserver(onLoad, options);
 
 form.addEventListener('submit', onFormSubmit);
 
-function onFormSubmit(e) {
+function onFormSubmit(e: SubmitEvent) {
   e.preventDefault();
-  queryInput = e.currentTarget.elements.query.value;
+  const queryInput = e.currentTarget as HTMLFormElement;
+  const queryValue = (
+    queryInput.elements.namedItem('query') as HTMLInputElement
+  ).value;
 
-  if (queryInput === '') {
+  if (queryValue === '') {
     iziToast.error({
       message:
         'Please enter a value!',
     });
     return;
   }
-  getImagesOnSearch(queryInput, currentPage)
+  getImagesOnSearch(queryValue, currentPage)
     .then(({ hits }) => {
       if (hits.length === 0) {
         iziToast.error({
